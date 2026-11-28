@@ -1,6 +1,6 @@
 {
   "name": "frameloft",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Frameloft – a lightweight, open-source photo browser and digital asset manager",
   "type": "module",
   "scripts": {
