@@ -29,7 +29,7 @@ image = { version = "0.25", default-features = false, features = ["jpeg", "png",
 rayon = "1"
 walkdir = "2"
 notify = "8"
-notify-debouncer-full = "0.7"
+notify-debouncer-full = "0.8"
 trash = "5"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream"] }
 base64 = "0.23"
