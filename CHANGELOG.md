@@ -4,6 +4,14 @@ New versions are listed here automatically from the commit messages (see
 [CONTRIBUTING.md](CONTRIBUTING.md)). Versions before 2.0.0 are described on the
 [Releases page](https://github.com/Light-Alley/Lumio/releases).
 
+## [2.1.1](https://github.com/frameloft/Frameloft/compare/v2.1.0...v2.1.1) (2026-11-28)
+
+
+### Bug Fixes
+
+* give Mac builds an ad-hoc signature so downloads aren't called damaged ([cc12a88](https://github.com/frameloft/Frameloft/commit/cc12a88129930c82a1282ae3199182019c6d7c59))
+* give Mac builds an ad-hoc signature so downloads aren't called damaged ([b67a7c9](https://github.com/frameloft/Frameloft/commit/b67a7c957a8db173997cf444e4e1340d7017b790))
+
 ## [2.1.0](https://github.com/frameloft/Frameloft/compare/v2.0.0...v2.1.0) (2026-11-27)
 
 
