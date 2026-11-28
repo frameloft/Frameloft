@@ -82,7 +82,7 @@ To check a download, compare its SHA-256 with `SHA256SUMS.txt` on the release pa
 
 If a build isn't code-signed, the first launch shows a warning (release notes say whether a build is signed):
 
-- **macOS**: right-click Frameloft in Applications, choose **Open**, then **Open** again. If macOS says the app "is damaged", run `xattr -cr /Applications/Frameloft.app` in Terminal once.
+- **macOS**: open Frameloft from Applications. When macOS says it can't verify the app, click **Done**, go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to Frameloft, then confirm. This is needed once. (On macOS 14 and earlier, right-clicking Frameloft and choosing **Open** also works.) Frameloft 2.1.0 and earlier weren't signed at all, so macOS called them "damaged"; for those, run `xattr -cr /Applications/Frameloft.app` in Terminal once.
 - **Windows**: on the SmartScreen prompt, click **More info**, then **Run anyway**.
 
 ## Using the AI finder
