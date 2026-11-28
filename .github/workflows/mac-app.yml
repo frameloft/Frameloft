@@ -50,8 +50,3 @@ jobs:
       - name: Check the signature as a download, and that the app starts
         run: scripts/check-macos-app.sh --launch src-tauri/target/release/bundle/dmg/*.dmg
 
-      - name: TEMPORARY - the published 2.1.0 must fail this check
-        run: |
-          curl -sSfL -o old.dmg https://github.com/frameloft/Frameloft/releases/download/v2.1.0/Frameloft_2.1.0_aarch64.dmg
-          if scripts/check-macos-app.sh old.dmg; then echo "::error::2.1.0 passed, so the check proves nothing"; exit 1; fi
-          echo "2.1.0 fails the check, as expected."
