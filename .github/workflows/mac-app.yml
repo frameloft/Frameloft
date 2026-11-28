@@ -1,0 +1,57 @@
+# Builds the Mac app the way the release does (ad-hoc signature, no Apple account) and
+# checks it as a download would be checked: a Mac app whose signature is missing or broken
+# is reported by macOS as "damaged". Runs only when something that changes the Mac build
+# changes, because Mac build minutes cost more.
+name: Mac app signature
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/mac-app.yml"
+      - ".github/workflows/release.yml"
+      - "scripts/check-macos-app.sh"
+      - "src-tauri/tauri.conf.json"
+      - "src-tauri/tauri.macos-adhoc.json"
+      - "src-tauri/Cargo.lock"
+      - "package-lock.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mac-app-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mac-app:
+    name: Build and check the Mac app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+
+      - run: npm ci
+
+      - name: Build the app and .dmg (ad-hoc signed, like a release)
+        run: npx tauri build --bundles app,dmg --config src-tauri/tauri.macos-adhoc.json
+
+      - name: Check the signature as a download, and that the app starts
+        run: scripts/check-macos-app.sh --launch src-tauri/target/release/bundle/dmg/*.dmg
+
+      - name: TEMPORARY - the published 2.1.0 must fail this check
+        run: |
+          curl -sSfL -o old.dmg https://github.com/frameloft/Frameloft/releases/download/v2.1.0/Frameloft_2.1.0_aarch64.dmg
+          if scripts/check-macos-app.sh old.dmg; then echo "::error::2.1.0 passed, so the check proves nothing"; exit 1; fi
+          echo "2.1.0 fails the check, as expected."

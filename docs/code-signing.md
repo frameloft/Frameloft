@@ -4,6 +4,19 @@ Unsigned apps work, but macOS and Windows warn people before they open them. For
 
 Secrets go in **GitHub → the Frameloft repository → Settings → Secrets and variables → Actions → New repository secret**. Only people with admin rights on the repository can see or change them, and they never appear in logs.
 
+## macOS without an Apple account: ad-hoc signature
+
+Until there is a Developer ID certificate, the workflow gives the Mac app an *ad-hoc* signature (`src-tauri/tauri.macos-adhoc.json`). It says nothing about who made the app, but it seals the app's files, so macOS can tell the download is intact. People then get the usual "Apple could not verify Frameloft" prompt and can open it with **System Settings → Privacy & Security → Open Anyway**. Without any signature, macOS on Apple Silicon reports a downloaded app as "damaged" and offers only to move it to the Bin.
+
+After building, the workflow checks the `.dmg` and the in-app update file as a download would be checked (`scripts/check-macos-app.sh`), and the **Mac app signature** check does the same on pull requests that change the Mac build. To check a downloaded copy by hand:
+
+```bash
+codesign --verify --deep --strict --verbose=2 /Applications/Frameloft.app   # "valid on disk", "satisfies its Designated Requirement"
+codesign -dv /Applications/Frameloft.app 2>&1 | grep -E 'Signature|Sealed'  # "Signature=adhoc", "Sealed Resources version=2"
+```
+
+Once the secrets below are added, the Developer ID signature is used instead.
+
 ## macOS: Developer ID signing and notarisation
 
 This removes the "Apple could not verify Frameloft is free of malware" warning and the `xattr -cr` workaround.

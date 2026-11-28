@@ -153,7 +153,11 @@ jobs:
                 echo "::warning::macOS build is signed but NOT notarised (APPLE_ID, APPLE_PASSWORD or APPLE_TEAM_ID missing)."
               fi
             else
-              echo "::warning::macOS build is not signed (APPLE_CERTIFICATE secrets not set). See docs/code-signing.md."
+              # Ad-hoc signature: no Apple account needed. Without any signature macOS calls
+              # a downloaded app "damaged"; with this one it shows the usual "can't be
+              # verified" prompt, which System Settings > Privacy & Security > Open Anyway gets past.
+              cfgs+=("src-tauri/tauri.macos-adhoc.json")
+              echo "::warning::macOS build has an ad-hoc signature only (APPLE_CERTIFICATE secrets not set), so the first launch needs Open Anyway. See docs/code-signing.md."
             fi
           fi
           if [ "$RUNNER_OS" = "Windows" ]; then
@@ -218,6 +222,21 @@ jobs:
           # latest.json tells installed copies about the new version (only written when
           # the updater key is set, see above).
           uploadUpdaterJson: true
+
+      # A downloaded Mac app with a broken or missing signature is "damaged" to macOS, so
+      # check the .dmg and the in-app update the way a download is checked.
+      - name: Check the Mac app's signature
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          ARTIFACTS: ${{ steps.tauri.outputs.artifactPaths }}
+        run: |
+          files=()
+          while IFS= read -r f; do files+=("$f"); done < <(node -e '
+            for (const p of JSON.parse(process.env.ARTIFACTS || "[]"))
+              if (/\.(dmg|app\.tar\.gz)$/.test(p) && require("fs").statSync(p).isFile()) console.log(p);')
+          if [ ${#files[@]} -eq 0 ]; then echo "::error::no .dmg found to check"; exit 1; fi
+          scripts/check-macos-app.sh "${files[@]}"
 
       - name: List the installers
         id: built
